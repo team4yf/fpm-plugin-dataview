@@ -1,0 +1,32 @@
+{
+  "name": "dv_schedule",         
+  "comment": "the schedule list",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "comment": "计划任务的名称，英文名"
+    },
+    {
+      "name": "cron",
+      "type": "string",
+      "comment": "cron 表达式"
+    },
+    {
+      "name": "dv_name",
+      "type": "string",
+      "comment": "数据视图名称，英文名"
+    },
+    {
+      "name": "task_id",
+      "type": "bitint",
+      "comment": "生成的任务id"
+    },
+    {
+      "name": "autorun",
+      "type": "bool",
+      "dft": "1",
+      "comment": "创建成功后，自动执行"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "dv_task",         
+  "comment": "the task of the dataview tool",
+  "fields": [
+    {
+      "name": "dv_name",
+      "type": "string",
+      "comment": "数据视图名称，英文名"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "dft": "TODO",
+      "comment": "任务执行状态。TODO：待执行，PENDING：执行中，DONE：完成，ERROR：异常结束，CANCEL：取消"
+    },
+    {
+      "name": "result",
+      "type": "longText",
+      "comment": "任务执行的结果"
+    },
+    {
+      "name": "args",
+      "type": "string",
+      "dft": "{}",
+      "comment": "任务执行需要传入的参数，可以为空，JSON格式的字符串"
+    },
+    {
+      "name": "startAt",
+      "type": "timestamp",
+      "comment": "任务开始时间"
+    },
+    {
+      "name": "finishAt",
+      "type": "timestamp",
+      "comment": "任务开始时间"
+    },
+    {
+      "name": "error",
+      "type": "longText",
+      "comment": "任务执行错误的内容"
+    }
+  ]
+}

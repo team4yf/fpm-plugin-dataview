@@ -1,0 +1,40 @@
+{
+  "name": "dv_dataview",         
+  "comment": "the dataview list",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "comment": "数据视图名称，英文名"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "dft": "Untitled",
+      "comment": "视图的标题"
+    },
+    {
+      "name": "origin_sql",
+      "type": "text",
+      "comment": "视图的sql"
+    },
+    {
+      "name": "args",
+      "type": "string",
+      "dft": "{}",
+      "comment": "视图执行需要传入的参数，可以为空，JSON格式的字符串"
+    },
+    {
+      "name": "filter",
+      "type": "string",
+      "dft": "{}",
+      "comment": "视图过滤器，可以为空，JSON格式的字符串"
+    },
+    {
+      "name": "sortBy",
+      "type": "string",
+      "dft": "id-",
+      "comment": "视图排序的参数，可以为空"
+    }
+  ]
+}
