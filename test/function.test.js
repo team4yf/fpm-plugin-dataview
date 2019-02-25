@@ -12,22 +12,36 @@ describe('Function', function(){
     done()
   })
 
-  it('Function A', function(done){
-    var func = new Func('dataview.run');
-    func.invoke({ dv_name: 'foo' })
+  it('Function Create', function(done){
+    var func = new Func('dataview.create');
+    func.invoke({ name: 'foo', title: 'foo title', origin_sql: 'select * from dvc_device', args: {}  })
       .then(function(data){
         assert.strictEqual(data == undefined, false, 'should not be undefined');
+        console.log(data);
         done();
       }).catch(function(err){
         done(err);
       })
   })
+
+  it('Function A', function(done){
+    var func = new Func('dataview.run');
+    func.invoke({ dv_name: 'foo', args: {name: '测试'}  })
+      .then(function(data){
+        assert.strictEqual(data == undefined, false, 'should not be undefined');
+        console.log(data);
+        done();
+      }).catch(function(err){
+        done(err);
+      })
+  })
+
   it('Function B', function(done){
     var func = new Func('dataview.run');
-    func.invoke({ dv_name: 'foo', cron: '* * * * *', name: 'test' })
+    func.invoke({ dv_name: 'foo', record: true, args: {name: '测试'} })
       .then(function(data){
-        console.log(data)
         assert.strictEqual(data == undefined, false, 'should not be undefined');
+        console.log(data);
         done();
       }).catch(function(err){
         done(err);

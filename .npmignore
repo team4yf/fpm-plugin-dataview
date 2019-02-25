@@ -1,5 +1,7 @@
+spec/
 dev/
-sql/
 views/
+schedule.json
 db.lock
-.babelrc
+config.json
+init.sql

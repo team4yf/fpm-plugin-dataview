@@ -18,21 +18,12 @@ npm add fpm-plugin-dataview --save
 
 - dep plugins
   - mysql
-  - schedule
 
 - config
 
 - methods
   - [ ] create(dv_name!string, origin_sql!string, dv_title?string) => Promise(<Integer>);
-  - [ ] edit(dv_name!string, origin_sql!string, dv_title?string) => Promise(<0/!0>);
-  - [ ] disable(dv_name!string) => Promise(<0/!0>);
-  - [ ] dir() => Promise(<List<Object>>);
-  - [ ] get(dv_name!string) => Promise(<Object>);
-  - [ ] dirTask(dv_name?string) => Promise(<List<Object>>);
-    * list tasks of the dataview
-  - [ ] getTask(task_id!Integer) => Promise(Object);
-  - [ ] getLatest(dv_name) => Promise(Object); 
-  - [ ] run(dv_name!string, schedule?string[corn type]) => Promise(<any>);
+  - [ ] run(dv_name!string) => Promise(<any>);
 
 - subscribe
 

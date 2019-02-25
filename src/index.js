@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const assert = require('assert');
-
+const path = require('path');
 module.exports = {
   bind: (fpm) => {
     // Run When Server Init
@@ -22,32 +22,59 @@ module.exports = {
   - [ ] run(dv_name!string, schedule?string[corn type]) => Promise(<any>);
      */
     const bizModule = {
+      create: async bizArgs => {
+        const { M } = fpm;
+        const NOW = _.now();
+        const { args } = bizArgs;
+        if(_.isObjectLike(args)){
+          bizArgs.args = JSON.stringify(args);
+        }
+        try {
+          const count = await M.countAsync({
+            table: 'dv_dataview',
+            condition: `name = '${ bizArgs.name}'`
+          })
+          if(count > 0){
+            return Promise.reject({
+              message: `dataview name [${ bizArgs.name }] exists!`,
+            })
+          }
+          const result = await M.createAsync({
+            table: 'dv_dataview',
+            row: _.assign(bizArgs, {
+              createAt: NOW,
+              updateAt: NOW,
+            })
+          })
+          return result;  
+        } catch (error) {
+          return Promise.reject(error);
+        }
+        
+      },
       run: async (bizArgs) => {
-        console.log('do things', bizArgs);
-        const { dv_name, cron, job } = bizArgs;
+        const { dv_name, args = {}, record = false } = bizArgs;
+        if(_.isString(args)){
+          bizArgs.args = JSON.parse(args);
+        }
         try {
           assert(dv_name != undefined, 'dv_name required');
           const { M } = fpm;
-          if(cron){
-            const NOW = _.now();
-            // make a schedule job with the cron
-            const { name, autorun = 1 } = bizArgs;
-            await M.createAsync({
-              table: 'dv_schedule',
-              row: {
-                name, autorun, cron, dv_name, createAt: NOW, updateAt: NOW,
-              }
+          let result;
+
+          const count = await M.countAsync({
+            table: 'dv_dataview',
+            condition: `name = '${ dv_name }'`
+          })
+          if(count != 1){
+            return Promise.reject({
+              message: `dataview name [${ dv_name }] not exists!`,
             })
-            await fpm.execute('job.createCronJob', {method: 'dataview.run', cron, name, autorun, args: { dv_name, job:1 }})
-            return 1;
           }
-          let task;
-          if(job){
-            // the it's a job request
-            
+          if(record){
             // create a task
-            task = await M.createAsync({
-              table: 'dv_task',
+            result = await M.createAsync({
+              table: 'dv_result',
               row: {
                 dv_name,
                 startAt: _.now(),
@@ -62,31 +89,28 @@ module.exports = {
           assert(!_.isEmpty(dataview), 'dv_name not exists');
           const { origin_sql, args, filter, sortBy } = dataview;
           const compiled = _.template(origin_sql);
-          const sql = compiled(JSON.parse(args));
+          const sqlArgs = _.assign(JSON.parse(args),{NOW: _.now()}, bizArgs.args );
+          const sql = compiled(sqlArgs);
           const data = await M.findAndCountAsync({
             table: `(${sql}) as T`,
             condition: filter,
             sort: sortBy,
             limit: 100,
           })
-          if(job){
+          if(record){
             // feedback the job's result
             await M.updateAsync({
-              table: 'dv_task',
+              table: 'dv_result',
+              condition: `id = ${ result.id }`,
               row: {
                 finishAt: _.now(),
                 status: 'DONE',
+                real_sql: sql.replace(/'/g,`"`),
+                args: JSON.stringify(sqlArgs),
                 result: JSON.stringify(data)
               }
             })
-            await M.updateAsync({
-              table: 'dv_schedule',
-              condition: `dv_name = '${ dv_name }'`,
-              row: {
-                task_id: task.id
-              }
-            })
-            return;
+            return { result_id: result.id };
           }
           return { data };
         } catch (error) {
@@ -99,6 +123,12 @@ module.exports = {
     };
     fpm.registerAction('BEFORE_SERVER_START', () => {
       fpm.extendModule('dataview', bizModule)
+      if(fpm.M){
+        fpm.M.install(path.join(__dirname,'../sql'))
+          .catch(e => {
+            fpm.logger.error(e);
+          })
+      }
     })
     return bizModule;
   }
